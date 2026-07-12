@@ -5,4 +5,4 @@ Feature: Service health
 
     Scenario: Check service is healthy
         When I request the health endpoint
-        Then the service reports it is healthy
+        Then the service should report it is healthy

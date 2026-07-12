@@ -12,4 +12,6 @@ default:
             paths:
                 - '%paths.base%/features'
             contexts:
+                - App\Behat\DatabaseContext
                 - App\Behat\HealthContext
+                - App\Behat\SurrogateLifecycleContext

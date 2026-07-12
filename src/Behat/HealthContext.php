@@ -21,7 +21,7 @@ final readonly class HealthContext implements Context
         $this->client->request('GET', '/healthz');
     }
 
-    #[Then('the service reports it is healthy')]
+    #[Then('the service should report it is healthy')]
     public function theServiceReportsItIsHealthy(): void
     {
         $response = $this->client->getResponse();

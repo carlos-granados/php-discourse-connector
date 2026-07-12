@@ -1,2 +1,37 @@
 framework:
-    workflows: null
+    workflows:
+        surrogate_subscription:
+            type: state_machine
+            marking_store:
+                type: method
+                property: marking
+            supports:
+                - App\Entity\SurrogateUser
+            initial_marking: pending
+            places:
+                - pending
+                - subscribe_sent
+                - confirming
+                - subscribed
+                - unsubscribing
+                - unsubscribed
+                - disabled
+            transitions:
+                send_subscribe:
+                    from: pending
+                    to: subscribe_sent
+                receive_confirmation_request:
+                    from: subscribe_sent
+                    to: confirming
+                complete_subscription:
+                    from: confirming
+                    to: subscribed
+                start_unsubscribe:
+                    from: subscribed
+                    to: unsubscribing
+                complete_unsubscribe:
+                    from: unsubscribing
+                    to: unsubscribed
+                disable:
+                    from: [pending, subscribe_sent, confirming, subscribed, unsubscribing, unsubscribed]
+                    to: disabled

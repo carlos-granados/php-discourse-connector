@@ -4,7 +4,7 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
-        "php": ">=8.4",
+        "php": ">=8.5",
         "ext-ctype": "*",
         "ext-iconv": "*",
         "doctrine/doctrine-bundle": "^3.2",
@@ -22,6 +22,7 @@
         "symfony/rate-limiter": "7.4.*",
         "symfony/runtime": "7.4.*",
         "symfony/serializer": "7.4.*",
+        "symfony/uid": "7.4.*",
         "symfony/validator": "7.4.*",
         "symfony/workflow": "7.4.*",
         "symfony/yaml": "7.4.*"
@@ -70,15 +71,10 @@
         "post-update-cmd": [
             "@auto-scripts"
         ],
-        "phpunit": [
-            "bin/console doctrine:database:create --env=test --if-not-exists -q",
-            "phpunit"
-        ],
-        "behat": [
-            "bin/console doctrine:database:create --env=test --if-not-exists -q",
-            "behat"
-        ],
+        "phpunit": "phpunit",
+        "behat": "behat",
         "test": [
+            "@test:db:init",
             "@phpunit",
             "@behat"
         ],
@@ -98,6 +94,10 @@
             "@rector",
             "@stan",
             "@test"
+        ],
+        "test:db:init": [
+            "bin/console doctrine:database:create --env=test --if-not-exists -q",
+            "bin/console doctrine:migrations:migrate --env=test --no-interaction --allow-no-migration -q"
         ]
     },
     "conflict": {
@@ -112,6 +112,7 @@
     },
     "require-dev": {
         "behat/behat": "^3.32",
+        "dama/doctrine-test-bundle": "^8.6",
         "friends-of-behat/mink-browserkit-driver": "^1.6",
         "friends-of-behat/mink-extension": "^2.7",
         "friends-of-behat/symfony-extension": "^2.6",
@@ -130,6 +131,7 @@
         "stan": "Run PHPStan static analysis",
         "cs": "Check coding standards (cs:fix to apply)",
         "rector": "Rector dry-run (rector:fix to apply)",
-        "ci": "Run all checks: cs, rector, phpstan, tests"
+        "ci": "Run all checks: cs, rector, phpstan, tests",
+        "test:db:init": "Create the test database and run migrations"
     }
 }
