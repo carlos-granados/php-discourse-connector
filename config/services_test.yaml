@@ -1,0 +1,11 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\Behat\:
+        resource: '../src/Behat/'
+
+    Symfony\Bundle\FrameworkBundle\KernelBrowser:
+        alias: test.client
+        public: true

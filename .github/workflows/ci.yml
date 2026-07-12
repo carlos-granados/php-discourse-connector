@@ -1,0 +1,30 @@
+name: CI
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+
+jobs:
+    ci:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Build images
+              run: docker compose build
+
+            - name: Install dependencies
+              run: docker compose run --rm --no-deps app composer install --no-interaction --no-progress
+
+            - name: Coding standards
+              run: docker compose run --rm --no-deps app composer cs
+
+            - name: Rector
+              run: docker compose run --rm --no-deps app composer rector
+
+            - name: Static analysis
+              run: docker compose run --rm --no-deps app composer stan
+
+            - name: Tests (PHPUnit + Behat)
+              run: docker compose run --rm app composer test

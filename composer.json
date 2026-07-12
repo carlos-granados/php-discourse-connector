@@ -1,0 +1,135 @@
+{
+    "type": "project",
+    "license": "proprietary",
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=8.4",
+        "ext-ctype": "*",
+        "ext-iconv": "*",
+        "doctrine/doctrine-bundle": "^3.2",
+        "doctrine/doctrine-migrations-bundle": "^4.0",
+        "doctrine/orm": "^3.6",
+        "symfony/console": "7.4.*",
+        "symfony/doctrine-messenger": "7.4.*",
+        "symfony/dotenv": "7.4.*",
+        "symfony/flex": "^2",
+        "symfony/framework-bundle": "7.4.*",
+        "symfony/http-client": "7.4.*",
+        "symfony/mailer": "7.4.*",
+        "symfony/messenger": "7.4.*",
+        "symfony/monolog-bundle": "^4.0",
+        "symfony/rate-limiter": "7.4.*",
+        "symfony/runtime": "7.4.*",
+        "symfony/serializer": "7.4.*",
+        "symfony/validator": "7.4.*",
+        "symfony/workflow": "7.4.*",
+        "symfony/yaml": "7.4.*"
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true,
+            "symfony/flex": true,
+            "symfony/runtime": true,
+            "phpstan/extension-installer": true
+        },
+        "bump-after-update": true,
+        "sort-packages": true,
+        "process-timeout": 0
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "App\\Tests\\": "tests/"
+        }
+    },
+    "replace": {
+        "symfony/polyfill-ctype": "*",
+        "symfony/polyfill-iconv": "*",
+        "symfony/polyfill-php72": "*",
+        "symfony/polyfill-php73": "*",
+        "symfony/polyfill-php74": "*",
+        "symfony/polyfill-php80": "*",
+        "symfony/polyfill-php81": "*",
+        "symfony/polyfill-php82": "*",
+        "symfony/polyfill-php83": "*",
+        "symfony/polyfill-php84": "*"
+    },
+    "scripts": {
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+        },
+        "post-install-cmd": [
+            "@auto-scripts"
+        ],
+        "post-update-cmd": [
+            "@auto-scripts"
+        ],
+        "phpunit": [
+            "bin/console doctrine:database:create --env=test --if-not-exists -q",
+            "phpunit"
+        ],
+        "behat": [
+            "bin/console doctrine:database:create --env=test --if-not-exists -q",
+            "behat"
+        ],
+        "test": [
+            "@phpunit",
+            "@behat"
+        ],
+        "stan": "phpstan analyse --no-progress",
+        "cs": [
+            "@putenv PHP_CS_FIXER_IGNORE_ENV=1",
+            "php-cs-fixer fix --dry-run --diff"
+        ],
+        "cs:fix": [
+            "@putenv PHP_CS_FIXER_IGNORE_ENV=1",
+            "php-cs-fixer fix"
+        ],
+        "rector": "rector process --dry-run",
+        "rector:fix": "rector process",
+        "ci": [
+            "@cs",
+            "@rector",
+            "@stan",
+            "@test"
+        ]
+    },
+    "conflict": {
+        "symfony/symfony": "*"
+    },
+    "extra": {
+        "symfony": {
+            "allow-contrib": false,
+            "require": "7.4.*",
+            "docker": "false"
+        }
+    },
+    "require-dev": {
+        "behat/behat": "^3.32",
+        "friends-of-behat/mink-browserkit-driver": "^1.6",
+        "friends-of-behat/mink-extension": "^2.7",
+        "friends-of-behat/symfony-extension": "^2.6",
+        "friendsofphp/php-cs-fixer": "^3.95",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan": "^2.2",
+        "phpstan/phpstan-doctrine": "^2.0",
+        "phpstan/phpstan-symfony": "^2.0",
+        "phpunit/phpunit": "^13.2",
+        "rector/rector": "^2.5",
+        "symfony/browser-kit": "7.4.*",
+        "symfony/css-selector": "7.4.*"
+    },
+    "scripts-descriptions": {
+        "test": "Run PHPUnit and Behat suites",
+        "stan": "Run PHPStan static analysis",
+        "cs": "Check coding standards (cs:fix to apply)",
+        "rector": "Rector dry-run (rector:fix to apply)",
+        "ci": "Run all checks: cs, rector, phpstan, tests"
+    }
+}

@@ -1,0 +1,41 @@
+services:
+  app:
+    build:
+      context: .
+      target: dev
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: connector
+      POSTGRES_USER: connector
+      POSTGRES_PASSWORD: connector
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U connector -d connector"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    ports:
+      - "54320:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  mailpit:
+    image: axllent/mailpit
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    ports:
+      - "8025:8025"
+
+volumes:
+  pgdata:
