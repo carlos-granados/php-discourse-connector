@@ -1,7 +1,7 @@
 default:
     extensions:
         FriendsOfBehat\SymfonyExtension:
-            bootstrap: tests/bootstrap.php
+            bootstrap: tests/bootstrap_behat.php
             kernel:
                 class: App\Kernel
                 environment: test
@@ -15,3 +15,4 @@ default:
                 - App\Behat\DatabaseContext
                 - App\Behat\HealthContext
                 - App\Behat\SurrogateLifecycleContext
+                - App\Behat\WebhookContext
