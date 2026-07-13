@@ -7,6 +7,7 @@ namespace App\Behat;
 use App\Entity\SurrogateUser;
 use App\Enum\SurrogateStatus;
 use App\Mail\SurrogateAddressFactory;
+use App\Repository\SurrogateUserRepository;
 use Behat\Behat\Context\Context;
 use Behat\Step\Given;
 use Behat\Step\Then;
@@ -24,6 +25,7 @@ final class SurrogateLifecycleContext implements Context
         #[Target('surrogate_subscription')]
         private readonly WorkflowInterface $workflow,
         private readonly SurrogateAddressFactory $addressFactory,
+        private readonly SurrogateUserRepository $surrogates,
     ) {
     }
 
@@ -95,6 +97,40 @@ final class SurrogateLifecycleContext implements Context
         }
     }
 
+    #[Then('a surrogate for Discourse user :username should exist')]
+    public function aSurrogateForDiscourseUserShouldExist(string $username): void
+    {
+        $this->findByUsername($username) ?? throw new \RuntimeException(\sprintf('No surrogate found for Discourse user "%s".', $username));
+    }
+
+    #[Then('no surrogate for Discourse user :username should exist')]
+    public function noSurrogateForDiscourseUserShouldExist(string $username): void
+    {
+        if ($this->findByUsername($username) instanceof SurrogateUser) {
+            throw new \RuntimeException(\sprintf('A surrogate for Discourse user "%s" unexpectedly exists.', $username));
+        }
+    }
+
+    #[Then('the surrogate should have display name :displayName')]
+    public function theSurrogateShouldHaveDisplayName(string $displayName): void
+    {
+        $actual = $this->reloadedSurrogate()->getDisplayName();
+
+        if ($displayName !== $actual) {
+            throw new \RuntimeException(\sprintf('Expected display name "%s", got "%s".', $displayName, $actual));
+        }
+    }
+
+    #[Then('the surrogate should have real email :email')]
+    public function theSurrogateShouldHaveRealEmail(string $email): void
+    {
+        $actual = $this->reloadedSurrogate()->getRealEmail();
+
+        if ($email !== $actual) {
+            throw new \RuntimeException(\sprintf('Expected real email "%s", got "%s".', $email, $actual));
+        }
+    }
+
     #[Then('the surrogate should not be allowed to become subscribed')]
     public function theSurrogateCannotBeMarkedSubscribed(): void
     {
@@ -114,12 +150,27 @@ final class SurrogateLifecycleContext implements Context
         return $this->surrogate ?? throw new \LogicException('No surrogate user was created in this scenario.');
     }
 
+    /**
+     * The single surrogate of the scenario, freshly loaded from the database.
+     * Surrogates may be created outside this context (e.g. by webhook
+     * processing), so this does not rely on the locally cached instance.
+     */
     private function reloadedSurrogate(): SurrogateUser
     {
-        $surrogate = $this->currentSurrogate();
+        $this->entityManager->clear();
+        $all = $this->surrogates->findAll();
+
+        if (1 !== \count($all)) {
+            throw new \RuntimeException(\sprintf('Expected exactly 1 surrogate user in this scenario, found %d.', \count($all)));
+        }
+
+        return $all[0];
+    }
+
+    private function findByUsername(string $username): ?SurrogateUser
+    {
         $this->entityManager->clear();
 
-        return $this->entityManager->find(SurrogateUser::class, $surrogate->getId())
-            ?? throw new \RuntimeException('Surrogate user not found in the database.');
+        return $this->surrogates->findOneBy(['discourseUsername' => $username]);
     }
 }

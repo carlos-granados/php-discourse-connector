@@ -9,6 +9,8 @@ use Behat\Step\Then;
 use Behat\Step\When;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Transport\InMemory\InMemoryTransport;
 use Symfony\Component\Messenger\Transport\TransportInterface;
 
@@ -20,7 +22,24 @@ final readonly class WebhookContext implements Context
         private TransportInterface $asyncTransport,
         #[Autowire(env: 'DISCOURSE_WEBHOOK_SECRET')]
         private string $webhookSecret,
+        private MessageBusInterface $bus,
     ) {
+    }
+
+    #[When('the queued messages are processed')]
+    public function theQueuedMessagesAreProcessed(): void
+    {
+        if (!$this->asyncTransport instanceof InMemoryTransport) {
+            throw new \LogicException('The async transport is expected to be in-memory in the test environment.');
+        }
+
+        foreach ($this->asyncTransport->getSent() as $envelope) {
+            // ReceivedStamp makes the bus handle the message synchronously
+            // instead of re-queueing it
+            $this->bus->dispatch($envelope->getMessage(), [new ReceivedStamp('async')]);
+        }
+
+        $this->asyncTransport->reset();
     }
 
     #[When('Discourse sends a signed :event webhook')]
@@ -99,7 +118,8 @@ final readonly class WebhookContext implements Context
                 'user' => [
                     'id' => 42,
                     'username' => 'jane_doe',
-                    'name' => 'Jane Doe',
+                    // user_updated carries a changed name so scenarios can observe the sync
+                    'name' => 'user_updated' === $event ? 'Jane D.' : 'Jane Doe',
                     'email' => 'jane.doe@example.com',
                 ],
             ],

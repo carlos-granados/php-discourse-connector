@@ -16,3 +16,5 @@ default:
                 - App\Behat\HealthContext
                 - App\Behat\SurrogateLifecycleContext
                 - App\Behat\WebhookContext
+                - App\Behat\MailContext
+                - App\Behat\InboundContext

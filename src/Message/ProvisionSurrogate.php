@@ -14,6 +14,7 @@ final readonly class ProvisionSurrogate
         public string $username,
         public ?string $displayName,
         public ?string $email,
+        public bool $staged = false,
     ) {
     }
 }

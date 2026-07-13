@@ -99,6 +99,7 @@ final readonly class DiscourseWebhookController
             $username,
             $this->stringField($user, 'name'),
             $this->stringField($user, 'email'),
+            $this->boolField($user, 'staged'),
         );
     }
 
@@ -140,7 +141,7 @@ final readonly class DiscourseWebhookController
             $topicId,
             $userId,
             $this->intField($post, 'category_id'),
-            true === ($post['via_email'] ?? false),
+            $this->boolField($post, 'via_email'),
         );
     }
 
@@ -174,5 +175,16 @@ final readonly class DiscourseWebhookController
         $value = $data[$key] ?? null;
 
         return \is_string($value) && '' !== $value ? $value : null;
+    }
+
+    /**
+     * True only when the key holds the literal boolean true; missing or any
+     * other value is treated as false.
+     *
+     * @param array<mixed> $data
+     */
+    private function boolField(array $data, string $key): bool
+    {
+        return true === ($data[$key] ?? null);
     }
 }
