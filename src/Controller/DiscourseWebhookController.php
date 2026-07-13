@@ -142,6 +142,9 @@ final readonly class DiscourseWebhookController
             $userId,
             $this->intField($post, 'category_id'),
             $this->boolField($post, 'via_email'),
+            $this->stringField($post, 'topic_title') ?? '',
+            $this->intField($post, 'post_number') ?? 1,
+            $this->intField($post, 'reply_to_post_number'),
         );
     }
 

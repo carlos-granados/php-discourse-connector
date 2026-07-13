@@ -22,5 +22,8 @@ services:
             # Behat contexts are only registered in the test environment (services_test.yaml)
             - '../src/Behat/'
 
+    # Default Discourse API implementation (overridden by the fake in test)
+    App\Discourse\DiscourseApi: '@App\Discourse\HttpDiscourseApi'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

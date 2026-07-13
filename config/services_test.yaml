@@ -9,3 +9,6 @@ services:
     Symfony\Bundle\FrameworkBundle\KernelBrowser:
         alias: test.client
         public: true
+
+    # Use the in-memory Discourse API in tests so scenarios can seed responses
+    App\Discourse\DiscourseApi: '@App\Discourse\FakeDiscourseApi'

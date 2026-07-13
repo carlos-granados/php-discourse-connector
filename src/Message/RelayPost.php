@@ -16,6 +16,9 @@ final readonly class RelayPost
         public int $discourseUserId,
         public ?int $categoryId,
         public bool $viaEmail,
+        public string $topicTitle,
+        public int $postNumber,
+        public ?int $replyToPostNumber,
     ) {
     }
 }

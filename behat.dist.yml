@@ -18,3 +18,4 @@ default:
                 - App\Behat\WebhookContext
                 - App\Behat\MailContext
                 - App\Behat\InboundContext
+                - App\Behat\PostingContext
